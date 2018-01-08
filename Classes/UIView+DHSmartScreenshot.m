@@ -26,11 +26,27 @@
     CGContextTranslateCTM(context, -croppingRect.origin.x, -croppingRect.origin.y);
 	
 	[self layoutIfNeeded];
-	[self.layer renderInContext:context];
+    if ([self isContainsWKWebView]) {
+        [self drawViewHierarchyInRect:croppingRect afterScreenUpdates:NO];
+    } else {
+        [self.layer renderInContext:context];
+    }
 	
 	UIImage *screenshotImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     return screenshotImage;
+}
+
+- (BOOL)isContainsWKWebView {
+    if ([self isKindOfClass:NSClassFromString(@"WKWebView")]) {
+        return YES;
+    }
+    for (UIView *view in self.subviews) {
+        if ([view isContainsWKWebView]) {
+            return YES;
+        }
+    }
+    return NO;
 }
 
 @end
